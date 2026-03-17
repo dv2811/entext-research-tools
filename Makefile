@@ -1,7 +1,4 @@
-# Substack Skill - Build and Development Commands
-# Delegates to tool_build.sh for all tool operations
-
--include .env
+include .env
 export PROJECT_DIR := $(CURDIR)
 
 TOOL_BUILD := ./tool_build.sh
@@ -85,3 +82,17 @@ tidy: ## Tidy go.mod
 .PHONY: deps
 deps: ## Download dependencies
 	go get ./...
+
+.PHONY: commit
+commit: ## Commit changes (usage: make commit MSG="commit message")
+	@if [ -z "$(MSG)" ]; then \
+		echo "Error: MSG not specified"; \
+		echo "Usage: make commit MSG=\"commit message\""; \
+		exit 1; \
+	fi
+	git add -A
+	git commit -m "$(MSG)"
+
+.PHONY: push
+push: ## Push to GitHub remote
+	git push origin main
