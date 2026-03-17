@@ -2,6 +2,7 @@
 # Delegates to tool_build.sh for all tool operations
 
 -include .env
+export PROJECT_DIR := $(CURDIR)
 
 TOOL_BUILD := ./tool_build.sh
 
