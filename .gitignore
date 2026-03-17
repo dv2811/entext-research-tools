@@ -21,6 +21,9 @@ session.json
 # Environment files (may contain sensitive paths)
 .env
 
+# Local build configuration
+Makefile
+
 # OS
 .DS_Store
 Thumbs.db
