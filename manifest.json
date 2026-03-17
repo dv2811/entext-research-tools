@@ -1,0 +1,15 @@
+{
+  "name": "entext-research-tool",
+  "version": "1.0.0",
+  "description": "Research tool for accessing external content platforms",
+  "permissions": {
+    "fs": {
+      "read": ["~/.config/substack-reader/**", "~/Library/Application Support/substack-reader/**", "%APPDATA%/substack-reader/**"],
+      "write": ["~/.config/substack-reader/**", "~/Library/Application Support/substack-reader/**", "%APPDATA%/substack-reader/**"]
+    },
+    "network": {
+      "allow": ["substack.com"]
+    },
+    "tools": ["exec"]
+  }
+}

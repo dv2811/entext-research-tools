@@ -1,6 +1,11 @@
+---
+name: entext-research-tool
+description: Research tool for accessing external content platforms via CLI. Use when you need to retrieve inbox posts, article content, or search publications like Substack.
+---
+
 # entext-research-tool
 
-Research tool for accessing external content platforms.
+Research tool for accessing external content platforms via command line.
 
 ## Installation
 
