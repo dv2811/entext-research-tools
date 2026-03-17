@@ -1,0 +1,26 @@
+# Test binary
+*.test
+
+# Output of the go coverage tool
+*.out
+
+# Dependency directories
+vendor/
+
+# IDE
+.idea/
+.vscode/
+*.swp
+*.swo
+*~
+
+# Session files (contains auth tokens - never commit)
+session.json
+*.session
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Go workspace file
+go.work
