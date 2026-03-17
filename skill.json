@@ -1,0 +1,22 @@
+{
+  "name": "entext-research-tool",
+  "version": "1.0.0",
+  "description": "Research tool for accessing external content platforms",
+  "author": "dv2811",
+  "repository": "https://github.com/dv2811/substack-skill",
+  "license": "MIT",
+  "tools": [
+    {
+      "name": "substack-reader",
+      "description": "Substack CLI tool for inbox, articles, and search",
+      "entryPoint": "./tool_build.sh substack-reader"
+    }
+  ],
+  "permissions": [
+    "network",
+    "filesystem"
+  ],
+  "requirements": {
+    "go": "1.21+"
+  }
+}
