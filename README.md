@@ -1,37 +1,58 @@
-# Entext Research Tool
+# entext-research-tools
 
-This repository contains source codes for tools used by Entext Research to access subscriptions, performn searches and organize resources.
+Go-based tools for accessing external content platforms.
 
 ## Manual Installation
 
 ```bash
 # Clone the repository
-git clone https://github.com/dv2811/substack-skill.git
+git clone https://github.com/dv2811/entext-research-tools.git
 
 # Change to the project directory
-cd substack-skill
+cd entext-research-tools
 
 # Install a tool
 ./tool_build.sh <tool-name>
 ```
 
-Copy the tool's SKILL.md to your AI assistant's skills directory:
+### Install as AI Skill
+
+**Claude Code:**
+```bash
+claude plugin install dv2811/entext-research-tools
+```
+
+**Qwen Code:**
+```bash
+qwen extensions install dv2811/entext-research-tools
+```
+
+**Manual (copy skill directly):**
+```bash
+# Claude Code
+cp skills/<tool-name>/SKILL.md ~/.claude/skills/<tool-name>/SKILL.md
+
+# Qwen Code
+cp skills/<tool-name>/SKILL.md ~/.qwen/skills/<tool-name>/SKILL.md
+```
 
 ## Project Structure
 
 ```
-entext-research-tool/
-├── SKILL.md               # Root skill definition
-├── manifest.json          # OpenClaw permission manifest
-├── internal/
-│   └── <service>/         # Service API clients
+entext-research-tools/
+├── .claude-plugin/
+│   └── plugin.json        # Plugin manifest (Claude Code, auto-converts for Qwen)
+├── skills/
+│   └── <tool-name>/
+│       └── SKILL.md       # Skill definition
 ├── tools/
 │   ├── <tool-name>/       # CLI tools (one per directory)
 │   │   ├── setup.sh       # Installation script
 │   │   ├── README.md      # Tool documentation
-│   │   ├── SKILL.md       # Tool skill definition
 │   │   └── src/           # Source code
 │   └── ...                # Add more tools here
+├── internal/
+│   └── <service>/         # Service API clients
 ├── go.mod
 └── README.md
 ```
@@ -46,4 +67,4 @@ entext-research-tool/
 
 See individual tool directories for detailed usage:
 
-- **substack-reader:** `tools/substack-reader/README.md`, `tools/substack-reader/SKILL.md`
+- **substack-reader:** `tools/substack-reader/README.md`
