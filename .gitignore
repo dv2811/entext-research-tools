@@ -18,6 +18,9 @@ vendor/
 session.json
 *.session
 
+# Environment files (may contain sensitive paths)
+.env
+
 # OS
 .DS_Store
 Thumbs.db
