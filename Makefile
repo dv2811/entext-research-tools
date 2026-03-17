@@ -1,14 +1,5 @@
 # Load environment variables from .env file
 -include .env
-export PROJECT_DIR := $(CURDIR)
-
-# Go parameters
-GOCMD=go
-GOBUILD=$(GOCMD) build
-GOVET=$(GOCMD) vet
-GOTEST=$(GOCMD) test
-GOGET=$(GOCMD) get
-GOMOD=$(GOCMD) mod
 
 # Binary names
 BINARY_NAME=substack
@@ -25,7 +16,6 @@ BUILD_DARWIN=$(BINARY_DIR)/darwin/$(BINARY_NAME)
 BUILD_WINDOWS=$(BINARY_DIR)/windows/$(BINARY_NAME).exe
 BUILD_LOCAL=$(BINARY_DIR)/$(BINARY_NAME)
 
-# Default target
 .PHONY: help
 help: ## Print this help message
 	@echo "Substack CLI - Makefile Commands"
@@ -34,10 +24,9 @@ help: ## Print this help message
 	@awk -F ':.*## ' '/^[a-zA-Z_-]+:.*## / {printf "  \033[36m%-20s\033[0m %s\n", $$1, $$2}' $(MAKEFILE_LIST)
 	@echo ""
 
-# Build targets
 .PHONY: build release-all release-linux release-darwin release-windows
 build: $(BINARY_DIR) ## Build for current platform
-	$(GOBUILD) -o $(BUILD_LOCAL) ./$(SRC_DIR)/
+	go build -o $(BUILD_LOCAL) ./$(SRC_DIR)/
 	@echo "✓ Built: $(BUILD_LOCAL)"
 
 $(BINARY_DIR):
@@ -50,19 +39,18 @@ release-all: release-linux release-darwin release-windows ## Build for all platf
 	@echo "✓ Built all platforms"
 
 release-linux: $(BINARY_DIR) ## Build for Linux (amd64)
-	GOOS=linux GOARCH=amd64 $(GOBUILD) -o $(BUILD_LINUX) ./$(SRC_DIR)/
+	GOOS=linux GOARCH=amd64 go build -o $(BUILD_LINUX) ./$(SRC_DIR)/
 	@echo "✓ Built: $(BUILD_LINUX)"
 
 release-darwin: $(BINARY_DIR) ## Build for macOS (Intel + Apple Silicon)
-	GOOS=darwin GOARCH=amd64 $(GOBUILD) -o $(BUILD_DARWIN)_amd64 ./$(SRC_DIR)/
-	GOOS=darwin GOARCH=arm64 $(GOBUILD) -o $(BUILD_DARWIN)_arm64 ./$(SRC_DIR)/
+	GOOS=darwin GOARCH=amd64 go build -o $(BUILD_DARWIN)_amd64 ./$(SRC_DIR)/
+	GOOS=darwin GOARCH=arm64 go build -o $(BUILD_DARWIN)_arm64 ./$(SRC_DIR)/
 	@echo "✓ Built: $(BUILD_DARWIN)_amd64 and $(BUILD_DARWIN)_arm64"
 
 release-windows: $(BINARY_DIR) ## Build for Windows (amd64)
-	GOOS=windows GOARCH=amd64 $(GOBUILD) -o $(BUILD_WINDOWS) ./$(SRC_DIR)/
+	GOOS=windows GOARCH=amd64 go build -o $(BUILD_WINDOWS) ./$(SRC_DIR)/
 	@echo "✓ Built: $(BUILD_WINDOWS)"
 
-# Install/Setup targets
 .PHONY: setup install uninstall uninstall-all clean-session
 setup: ## Run full setup (build + install + auth session)
 	@echo "Running full setup..."
@@ -119,19 +107,17 @@ clean-session: ## Remove only the session file (for security)
 		echo "Session file location unknown - remove manually"; \
 	fi
 
-# Test & Lint targets
 .PHONY: test vet clean
 test: ## Run tests
-	$(GOTEST) -v ./$(INTERNAL_DIR)/...
+	go test -v ./$(INTERNAL_DIR)/...
 
 vet: ## Run go vet
-	$(GOVET) ./...
+	go vet ./...
 
 clean: ## Clean build artifacts
 	rm -rf $(BINARY_DIR)
 	@echo "✓ Cleaned build artifacts"
 
-# Run targets (require session)
 .PHONY: run-auth run-inbox run-search run-article
 run-auth: build ## Run auth command
 	./$(BUILD_LOCAL) auth
@@ -145,10 +131,9 @@ run-search: build ## Run search command with test query
 run-article: build ## Run article command (requires valid post-id)
 	./$(BUILD_LOCAL) article -post-id 123456
 
-# Dependency targets
 .PHONY: deps tidy
 deps: ## Download dependencies
-	$(GOGET) ./...
+	go get ./...
 
 tidy: ## Tidy go.mod
-	$(GOMOD) tidy
+	go mod tidy
