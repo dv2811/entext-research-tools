@@ -19,45 +19,6 @@ echo ""
 # Create directories
 mkdir -p "$BINARY_DIR"
 
-# Check for pre-built binary
-if [ -f "$PROJECT_ROOT/bin/koyfin" ]; then
-    echo "✓ Found pre-built binary"
-    cp "$PROJECT_ROOT/bin/koyfin" "$BIN_FILE"
-    chmod +x "$BIN_FILE"
-    echo "✓ Installed: $BIN_FILE"
-elif command -v go &> /dev/null; then
-    echo "Building from source..."
-    echo "✓ Go: $(go version)"
-    go build -o "$BIN_FILE" "$SCRIPT_DIR/src/"
-    chmod +x "$BIN_FILE"
-    echo "✓ Built: $BIN_FILE"
-else
-    echo "Error: No pre-built binary found and Go is not installed"
-    echo ""
-    echo "Options:"
-    echo "  1. Download pre-built binary from releases"
-    echo "  2. Install Go from https://go.dev/dl/"
-    exit 1
-fi
-
-# Copy Python utilities to scripts/ root
-if [ -d "$SCRIPT_DIR/utils" ]; then
-    echo ""
-    echo "Copying Python utilities..."
-    cp "$SCRIPT_DIR/utils/"*.py "$BINARY_DIR/"
-    cp "$SCRIPT_DIR/utils/requirements.txt" "$BINARY_DIR/" 2>/dev/null || true
-    echo "✓ Python utilities: $BINARY_DIR"
-fi
-
-# Detect Python command
-if command -v python3 &> /dev/null; then
-    PYTHON_CMD="python3"
-elif command -v python &> /dev/null; then
-    PYTHON_CMD="python"
-else
-    PYTHON_CMD=""
-fi
-
 # Done
 echo ""
 echo "======================"
@@ -71,10 +32,3 @@ echo "  $BIN_FILE auth"
 echo ""
 echo "Usage:"
 echo "  $BIN_FILE <command> -h"
-
-if [ -n "$PYTHON_CMD" ]; then
-    echo ""
-    echo "Python utilities:"
-    echo "  $PYTHON_CMD $BINARY_DIR/excel_export.py -h"
-    echo "  $BIN_FILE snapshot -kids <list_of_koyfin_ids> | $PYTHON_CMD $BINARY_DIR/excel_export.py -o snapshot.xlsx"
-fi

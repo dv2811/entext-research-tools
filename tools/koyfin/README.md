@@ -2,72 +2,23 @@
 
 Command-line tools for accessing Koyfin financial data. Search stocks, get snapshots, fetch time series data, retrieve earnings call transcripts, analyze ETF holdings, and run stock screeners.
 
-## Installation
-
-### Prerequisites
-
-- **Go 1.21+** (for building from source)
-- **Koyfin account** (for API access)
-
-### Quick Install
-
-```bash
-# Clone the repository
-git clone https://github.com/yourusername/chart-maker.git
-cd chart-maker
-
-# Build and install the koyfin tool
-./tool_build.sh koyfin
-```
-
-This will:
-1. Build the `koyfin` binary from source
-2. Install it to `~/.local/bin/koyfin`
-3. Prompt you for Koyfin credentials
-
-### Manual PATH Setup
-
-If the installation directory is not in your PATH, add it:
-
-```bash
-# For bash (Linux)
-echo 'export PATH="$HOME/.local/bin:$PATH"' >> ~/.bashrc
-source ~/.bashrc
-
-# For zsh (macOS)
-echo 'export PATH="$HOME/bin:$PATH"' >> ~/.zprofile
-source ~/.zprofile
-
-# For bash (macOS)
-echo 'export PATH="$HOME/bin:$PATH"' >> ~/.bash_profile
-source ~/.bash_profile
-```
-
-**Installation Paths by Platform:**
-
-| Platform | Binary Path | Config Path |
-|----------|-------------|-------------|
-| **Linux** | `~/.local/bin/koyfin` | `~/.config/koyfin/` |
-| **macOS** | `~/bin/koyfin` | `~/Library/Application Support/koyfin/` |
-| **Windows** | `%LOCALAPPDATA%\Programs\koyfin\koyfin.exe` | `%APPDATA%\koyfin\` |
-
-## Quick Start
+## Overview
 
 ```bash
 # Search for a stock
-koyfin search -q "Apple"
+./scripts/koyfin search -q "Apple"
 
 # Get snapshot data for multiple tickers
-koyfin snapshot -kids <list_of_koyfin_ids> -category Equity
+./scripts/koyfin snapshot -kids <list_of_koyfin_ids> -category Equity
 
 # Get 1 year of price data
-koyfin ticker-data -id <koyfin_id> -key "p_candle_range" -date-from "2024-01-01"
+./scripts/koyfin ticker-data -id <koyfin_id> -key "p_candle_range" -date-from "2024-01-01"
 
 # List recent earnings call transcripts
-koyfin transcript -action list -kid "AAPL:US" -limit 5
+./scripts/koyfin transcript -action list -kid "AAPL:US" -limit 5
 
 # Run a stock screener (large cap tech)
-koyfin screener -filters '[{"key":"t_sec","values":["Information Technology"]},{"key":"mkt","min":10000}]' -page-size 50
+./scripts/koyfin screener -filters '[{"key":"t_sec","values":["Information Technology"]},{"key":"mkt","min":10000}]' -page-size 50
 ```
 
 ## Commands
@@ -88,8 +39,8 @@ koyfin screener -filters '[{"key":"t_sec","values":["Information Technology"]},{
 Search for stocks or ETFs by name.
 
 ```bash
-koyfin search -q "Apple"
-koyfin search -q "SPY:US" -categories "ETF"
+./scripts/koyfin search -q "Apple"
+./scripts/koyfin search -q "SPY:US" -categories "ETF"
 ```
 
 | Flag | Description | Default |
@@ -103,7 +54,7 @@ koyfin search -q "SPY:US" -categories "ETF"
 Get current snapshot data with financial metrics.
 
 ```bash
-koyfin snapshot -kids <list_of_koyfin_ids> -category Equity
+./scripts/koyfin snapshot -kids <list_of_koyfin_ids> -category Equity
 ```
 
 | Flag | Description | Default |
@@ -118,8 +69,8 @@ koyfin snapshot -kids <list_of_koyfin_ids> -category Equity
 Get time series data for a ticker.
 
 ```bash
-koyfin ticker-data -id "AAPL:US" -key "p_candle_range" -date-from "2024-01-01"
-koyfin ticker-data -id "AAPL:US" -key "f_r" -date-from "2020-01-01" -fin-period "quarterly"
+./scripts/koyfin ticker-data -id "AAPL:US" -key "p_candle_range" -date-from "2024-01-01"
+./scripts/koyfin ticker-data -id "AAPL:US" -key "f_r" -date-from "2020-01-01" -fin-period "quarterly"
 ```
 
 | Flag | Description | Default |
@@ -138,13 +89,13 @@ Manage earnings call transcripts.
 
 ```bash
 # List transcripts for a ticker
-koyfin transcript -action list -kid "AAPL:US" -limit 5
+./scripts/koyfin transcript -action list -kid "AAPL:US" -limit 5
 
 # Get a specific transcript
-koyfin transcript -action get -transcript-id 123456
+./scripts/koyfin transcript -action get -transcript-id 123456
 
 # Get transcript summary
-koyfin transcript -action summary -transcript-id 123456
+./scripts/koyfin transcript -action summary -transcript-id 123456
 ```
 
 | Flag | Description | Default |
@@ -159,8 +110,8 @@ koyfin transcript -action summary -transcript-id 123456
 Get indicator schema reference.
 
 ```bash
-koyfin schema -asset-type Equity -indicator-type financials
-koyfin schema -asset-type Equity -indicator-type ratios
+./scripts/koyfin schema -asset-type Equity -indicator-type financials
+./scripts/koyfin schema -asset-type Equity -indicator-type ratios
 ```
 
 | Flag | Description | Default |
@@ -173,7 +124,7 @@ koyfin schema -asset-type Equity -indicator-type ratios
 Get ETF holdings data.
 
 ```bash
-koyfin etf-holdings -kids <list_of_koyfin_ids> -category ETF
+./scripts/koyfin etf-holdings -kids <list_of_koyfin_ids> -category ETF
 ```
 
 | Flag | Description | Default |
@@ -186,7 +137,7 @@ koyfin etf-holdings -kids <list_of_koyfin_ids> -category ETF
 Get available screener filters.
 
 ```bash
-koyfin screener-schema -asset-type Equity
+./scripts/koyfin screener-schema -asset-type Equity
 ```
 
 ### screener
@@ -195,13 +146,13 @@ Run stock screener with custom filters.
 
 ```bash
 # Large cap (>10B)
-koyfin screener -filters '[{"key":"mkt","min":10000}]'
+./scripts/koyfin screener -filters '[{"key":"mkt","min":10000}]'
 
 # Tech sector, 1B-10B market cap
-koyfin screener -filters '[{"key":"t_sec","values":["Information Technology"]},{"key":"mkt","min":1000,"max":10000}]' -page-size 50
+./scripts/koyfin screener -filters '[{"key":"t_sec","values":["Information Technology"]},{"key":"mkt","min":1000,"max":10000}]' -page-size 50
 
 # EV/EBITDA < 10
-koyfin screener -filters '[{"key":"evebitdaltm","max":10}]'
+./scripts/koyfin screener -filters '[{"key":"evebitdaltm","max":10}]'
 ```
 
 | Flag | Description | Default |
@@ -222,41 +173,17 @@ koyfin screener -filters '[{"key":"evebitdaltm","max":10}]'
 
 ## Authentication
 
-Run the setup script to authenticate:
-
 ```bash
-./tool_build.sh koyfin
+./scripts/koyfin auth -email <Koyfin account email> -password <Koyfin account password>
 ```
-
-You will be prompted for your Koyfin email and password. Credentials are stored securely and tokens are auto-generated on first API call.
-
-## Python Utilities (Optional)
-
-Location: `<binary_dir>/koyfin-utils/` (platform-specific)
-
-| Platform | Python Utilities Path |
-|----------|----------------------|
-| **Linux** | `~/.local/bin/koyfin-utils/` |
-| **macOS** | `~/bin/koyfin-utils/` |
-| **Windows** | `%LOCALAPPDATA%\Programs\koyfin\koyfin-utils\` |
 
 ### Excel Export
 
 Export snapshot data to Excel with formatted sheets:
 
 ```bash
-koyfin snapshot -kids <list_of_koyfin_ids> | \
-    python3 $UTILS_DIR/excel_export.py -o <output.xlsx>
-```
-
-**Note:** Replace `$UTILS_DIR` with your platform-specific path from the table above.
-
-**Linux/macOS example:**
-```bash
-koyfin snapshot -kids <list_of_koyfin_ids> | \
-    python3 ~/.local/bin/koyfin-utils/excel_export.py -o output.xlsx  # Linux
-koyfin snapshot -kids <list_of_koyfin_ids> | \
-    python3 ~/bin/koyfin-utils/excel_export.py -o output.xlsx  # macOS
+./scripts/koyfin snapshot -kids <list_of_koyfin_ids> | \
+    python3 ./scripts/utils/excel_export.py -o <output.xlsx>
 ```
 
 **Excel Sheets Created:**
@@ -271,62 +198,52 @@ koyfin snapshot -kids <list_of_koyfin_ids> | \
 ### Install Python Dependencies
 
 ```bash
-pip3 install -r $UTILS_DIR/requirements.txt
-```
-
-Example:
-```bash
-pip3 install -r ~/.local/bin/koyfin-utils/requirements.txt  # Linux
-pip3 install -r ~/bin/koyfin-utils/requirements.txt  # macOS
+pip3 install -r ./scripts/utils/requirements.txt
 ```
 
 ### Format Output as Tables
 
 ```bash
 # Format search results
-koyfin search -q "Apple" | python3 $UTILS_DIR/process.py search
+./scripts/koyfin search -q "Apple" | python3 ./scripts/utils/process.py search
 
 # Format snapshot
-koyfin snapshot -kids <list_of_koyfin_ids> | python3 $UTILS_DIR/process.py snapshot
+./scripts/koyfin snapshot -kids <list_of_koyfin_ids> | python3 ./scripts/utils/process.py snapshot
 ```
 
 ## Examples
 
 ```bash
 # Search for Apple
-koyfin search -q "Apple"
+./scripts/koyfin search -q "Apple"
 
 # Get snapshot for multiple tickers
-koyfin snapshot -kids <list_of_koyfin_ids> -category Equity
+./scripts/koyfin snapshot -kids <list_of_koyfin_ids> -category Equity
 
 # Get 1 year of daily price data
-koyfin ticker-data -id "AAPL:US" -key "p_candle_range" -date-from "2024-01-01"
+./scripts/koyfin ticker-data -id "AAPL:US" -key "p_candle_range" -date-from "2024-01-01"
 
 # Get quarterly revenue
-koyfin ticker-data -id "AAPL:US" -key "f_r" -date-from "2020-01-01" -fin-period quarterly
+./scripts/koyfin ticker-data -id "AAPL:US" -key "f_r" -date-from "2020-01-01" -fin-period quarterly
 
 # List recent transcripts
-koyfin transcript -action list -kid "AAPL:US" -limit 5
+./scripts/koyfin transcript -action list -kid "AAPL:US" -limit 5
 
 # Get transcript by ID
-koyfin transcript -action get -transcript-id 123456
+./scripts/koyfin transcript -action get -transcript-id 123456
 
 # Screen for large cap tech stocks
-koyfin screener -filters '[{"key":"t_sec","values":["Information Technology"]},{"key":"mkt","min":10000}]' -page-size 50
+./scripts/koyfin screener -filters '[{"key":"t_sec","values":["Information Technology"]},{"key":"mkt","min":10000}]' -page-size 50
 
 # Export to Excel (Linux example)
-koyfin snapshot -kids "AAPL:US,MSFT:US" | python3 ~/.local/bin/koyfin-utils/excel_export.py -o output.xlsx
+./scripts/koyfin snapshot -kids "AAPL:US,MSFT:US" | python3 ~/.local/bin/koyfin-utils/excel_export.py -o output.xlsx
 ```
 
 ## Troubleshooting
 
 ### "command not found: koyfin"
 
-Ensure `~/.local/bin` is in your PATH:
-
-```bash
-export PATH="$HOME/.local/bin:$PATH"
-```
+Ensure `/scripts` is in your AI tool skill directory
 
 ### "Error loading session"
 
@@ -339,7 +256,3 @@ Re-run the setup script to re-authenticate:
 ### "No data" or API errors
 
 Verify your Koyfin credentials are correct.
-
-## License
-
-[Same as main project]

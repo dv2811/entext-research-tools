@@ -19,7 +19,7 @@ vendor/
 # Session files (contains auth tokens - never commit)
 session.json
 *.session
-
+*.bin
 # Environment files (may contain sensitive paths)
 .env
 

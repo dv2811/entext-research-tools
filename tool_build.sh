@@ -89,34 +89,25 @@ build_tool() {
     local target_os="$4"
     local target_arch="$5"
 
-    local project_root binary_name bin_name bin_file
-    project_root="$(dirname "$tool_dir")"
+    local binary_name bin_file
     binary_name=$(get_binary_name "$tool_name" "$target_os")
-    bin_name="$binary_name"
     bin_file="$skills_dir/scripts/$binary_name"
 
-    if [ -f "$project_root/bin/$target_os/$bin_name" ]; then
-        echo "✓ Found pre-built binary for $target_os"
-        cp "$project_root/bin/$target_os/$bin_name" "$bin_file"
-        chmod +x "$bin_file"
-        echo "✓ Installed: $bin_file"
-    elif command -v go &> /dev/null; then
-        echo "Building from source..."
-        echo "✓ Go: $(go version)"
-        echo "✓ Target OS: $target_os"
-        echo "✓ Target Arch: $target_arch"
-        echo "✓ Deploying to: $skills_dir/scripts/"
-        GOOS="$target_os" GOARCH="$target_arch" go build -ldflags='-w -s' -o "$bin_file" "$tool_dir/src/"
-        chmod +x "$bin_file"
-        echo "✓ Built: $bin_file"
-    else
-        echo "Error: No pre-built binary found and Go is not installed"
+    if ! command -v go &> /dev/null; then
+        echo "Error: Go is not installed"
         echo ""
-        echo "Options:"
-        echo "  1. Download pre-built binary from releases"
-        echo "  2. Install Go from https://go.dev/dl/"
+        echo "Please install Go from https://go.dev/dl/"
         exit 1
     fi
+
+    echo "Building from source..."
+    echo "✓ Go: $(go version)"
+    echo "✓ Target OS: $target_os"
+    echo "✓ Target Arch: $target_arch"
+    echo "✓ Deploying to: $skills_dir/scripts/"
+    GOOS="$target_os" GOARCH="$target_arch" go build -ldflags='-w -s' -o "$bin_file" "$tool_dir/src/"
+    chmod +x "$bin_file"
+    echo "✓ Built: $bin_file"
 
     cp "$tool_dir/SKILL.md" "$skills_dir"
 
