@@ -5,6 +5,7 @@ import (
 	"fmt"
 	"os"
 
+	"entext-applications/internal/validator"
 	"entext-applications/internal/koyfin"
 	"entext-applications/internal/utils"
 )
@@ -36,7 +37,6 @@ func runScreener(client *koyfin.Client, session *koyfin.Session, args []string) 
 
 	req := koyfin.ScreenCriteria{
 		Conditions: filters,
-		OrderBy:    koyfin.CreateOrder("mkt", "DESC"),
 		PageSize:   uint32(pageSize),
 	}
 
@@ -54,6 +54,15 @@ func runScreener(client *koyfin.Client, session *koyfin.Session, args []string) 
 		} else if f.Max == nil && f.Min != nil {
 			req.Conditions[i].Max = utils.Ptr(koyfin.MaxFacetValue)
 		}
+	}
+
+	v := validator.New()
+	req.Validate(v)
+	if !v.Valid() {
+		for k, v := range v.Errors {
+			fmt.Printf("invalid: %s - %s\n", k, v)
+		}
+		os.Exit(1)
 	}
 
 	result, err := client.ScreenForStocks(session, req)
