@@ -10,16 +10,18 @@ import (
 )
 
 func runScreener(client *koyfin.Client, session *koyfin.Session, args []string) {
+	var filtersJSON string
+	var pageSize int
 	fs := newFlagSet("screener")
-	filtersJSON := fs.String("filters", "", "JSON array of filter conditions (required)")
-	pageSize := fs.Uint("page-size", 100, "Page size (max 300)")
+	fs.StringVar(&filtersJSON, "filters", "", "JSON array of filter conditions (required)")
+	fs.IntVar(&pageSize, "page-size", 100, "Page size (max 300)")
 
 	if err := fs.Parse(args); err != nil {
 		fmt.Fprintf(os.Stderr, "Error parsing flags: %v\n", err)
 		os.Exit(1)
 	}
 
-	if *filtersJSON == "" {
+	if filtersJSON == "" {
 		fmt.Fprintf(os.Stderr, "Error: -filters flag is required\n")
 		fs.Usage()
 		os.Exit(1)
@@ -27,7 +29,7 @@ func runScreener(client *koyfin.Client, session *koyfin.Session, args []string) 
 
 	// Parse filters from JSON
 	var filters []koyfin.Filter
-	if err := json.Unmarshal([]byte(*filtersJSON), &filters); err != nil {
+	if err := json.Unmarshal([]byte(filtersJSON), &filters); err != nil {
 		fmt.Fprintf(os.Stderr, "Error parsing filters JSON: %v\n", err)
 		os.Exit(1)
 	}
@@ -35,7 +37,7 @@ func runScreener(client *koyfin.Client, session *koyfin.Session, args []string) 
 	req := koyfin.ScreenCriteria{
 		Conditions: filters,
 		OrderBy:    koyfin.CreateOrder("mkt", "DESC"),
-		PageSize:   uint32(*pageSize),
+		PageSize:   uint32(pageSize),
 	}
 
 	// Add default primary filter

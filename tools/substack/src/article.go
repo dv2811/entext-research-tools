@@ -28,26 +28,32 @@ func runArticle(client *substack.Client, session *substack.Session, args []strin
 	// check valid session before authenticate
 	checkValidSession(session)
 
+	var (
+		baseURL string
+		postID int
+		compactMode bool
+	)
+
 	fs := newFlagSet("article")
-	postID := fs.Uint("post-id", 0, "Post ID to retrieve content for (required)")
-	baseURL := fs.String("base-url", "", "Custom Substack domain (optional, e.g., 'substack.com')")
-	compactMode := fs.Bool("compact-mode", false, "compact content mode")
+	fs.IntVar(&postID, "post-id", 0, "Post ID to retrieve content for (required)")
+	fs.StringVar(&baseURL, "base-url", "", "Custom Substack domain (optional, e.g., 'substack.com')")
+	fs.BoolVar(&compactMode, "compact-mode", false, "compact content mode")
 
 	if err := fs.Parse(args); err != nil {
 		fmt.Fprintf(os.Stderr, "Error parsing flags: %v\n", err)
 		os.Exit(1)
 	}
 
-	if *postID == 0 {
+	if postID == 0 {
 		fmt.Fprintf(os.Stderr, "Error: -post-id flag is required\n")
 		fs.Usage()
 		os.Exit(1)
 	}
 
 	article, err := client.GetArticleContent(session, &substack.PostContentRequest{
-		BaseURL: *baseURL,
-		PostID:  uint32(*postID),
-		CmpMode: *compactMode,
+		BaseURL: baseURL,
+		PostID:  uint32(postID),
+		CmpMode: compactMode,
 	})
 	if err != nil {
 		exitWithError(err)
