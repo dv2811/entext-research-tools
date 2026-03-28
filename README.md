@@ -71,11 +71,6 @@ entext-research-tools/
 │   ├── substack/            # Substack API client
 │   ├── koyfin/              # Koyfin API client
 │   └── ...
-├── bin/
-│   ├── build.sh             # Script to build all platform binaries
-│   ├── darwin/              # Pre-built macOS binaries
-│   ├── linux/               # Pre-built Linux binaries
-│   └── windows/             # Pre-built Windows binaries
 ├── go.mod
 ├── tool_build.sh            # Main build script
 └── README.md
@@ -120,16 +115,6 @@ entext-research-tools/
 /path/to/skills/koyfin/scripts/koyfin snapshot -kids "KID1,KID2" | \
   python3 /path/to/skills/koyfin/scripts/excel_export.py -o snapshot.xlsx
 ```
-
-## Building Releases
-
-To build pre-built binaries for all platforms:
-
-```bash
-./bin/build.sh
-```
-
-This creates binaries in `bin/<os>/` directories for distribution.
 
 ## Tool-Specific Documentation
 
