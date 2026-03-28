@@ -79,16 +79,17 @@ jobs:
           done
 
           # Create archive for each platform
-          mkdir -p "artifacts"
+          ARTIFACT_DIR="$(pwd)/artifacts"
+          mkdir -p "$ARTIFACT_DIR"
           for platform in "${PLATFORMS[@]}"; do
             read -r os arch <<< "$platform"
             OUT_DIR="${BUILD_DIR}/${os}/${BINARY_NAME}"
             ARCHIVE_NAME="${TOOL_NAME}-${os}-${arch}"
 
             if [ "$os" = "windows" ]; then
-              (cd "$OUT_DIR" && zip -r "../../../artifacts/${ARCHIVE_NAME}.zip" .)
+              (cd "$OUT_DIR" && zip -r "$ARTIFACT_DIR/${ARCHIVE_NAME}.zip" .)
             else
-              (cd "$OUT_DIR" && tar -czf "../../../artifacts/${ARCHIVE_NAME}.tar.gz" .)
+              (cd "$OUT_DIR" && tar -czf "$ARTIFACT_DIR/${ARCHIVE_NAME}.tar.gz" .)
             fi
           done
 
