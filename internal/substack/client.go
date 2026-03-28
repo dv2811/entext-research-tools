@@ -2,7 +2,7 @@ package substack
 
 import (
 	"net/http"
-	"net/http/cookiejar"
+	// "net/http/cookiejar"
 
 	"bytes"
 	"errors"

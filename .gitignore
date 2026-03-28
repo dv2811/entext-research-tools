@@ -33,3 +33,6 @@ Thumbs.db
 # Go workspace file
 go.work
 .editorconfig
+
+# Internal documentation (not for public repo)
+GUIDE.md

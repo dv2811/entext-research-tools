@@ -1,0 +1,102 @@
+name: Release Build
+
+on:
+  push:
+    tags:
+      - 'v*'
+
+permissions:
+  contents: write
+
+jobs:
+  build:
+    name: Build Release Binaries
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        tool: [substack, koyfin]
+        include:
+          - tool: substack
+            binary_name: substack
+          - tool: koyfin
+            binary_name: koyfin
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Set up Go
+        uses: actions/setup-go@v5
+        with:
+          go-version-file: go.mod
+
+      - name: Build for all platforms
+        id: build
+        run: |
+          TOOL_NAME="${{ matrix.tool }}"
+          BINARY_NAME="${{ matrix.binary_name }}"
+          SRC_DIR="tools/${TOOL_NAME}/src"
+          BUILD_DIR="build/${TOOL_NAME}"
+
+          # Platform configurations
+          PLATFORMS=(
+            "darwin amd64"
+            "darwin arm64"
+            "linux amd64"
+            "linux arm64"
+            "linux arm"
+            "windows amd64"
+            "windows 386"
+          )
+
+          for platform in "${PLATFORMS[@]}"; do
+            read -r os arch <<< "$platform"
+
+            # Create output directory
+            OUT_DIR="${BUILD_DIR}/${os}/${BINARY_NAME}"
+            mkdir -p "${OUT_DIR}/scripts"
+
+            # Set binary name
+            if [ "$os" = "windows" ]; then
+              BIN_FILE="${OUT_DIR}/scripts/${BINARY_NAME}.exe"
+            else
+              BIN_FILE="${OUT_DIR}/scripts/${BINARY_NAME}"
+            fi
+
+            # Build binary
+            echo "Building ${TOOL_NAME} for ${os}/${arch}..."
+            GOOS="$os" GOARCH="$arch" go build -ldflags='-w -s' -o "$BIN_FILE" "$SRC_DIR/"
+
+            # Copy SKILL.md
+            cp "tools/${TOOL_NAME}/SKILL.md" "${OUT_DIR}/"
+
+            # Copy utils if exists
+            if [ -d "tools/${TOOL_NAME}/utils" ]; then
+              mkdir -p "${OUT_DIR}/utils"
+              cp -r "tools/${TOOL_NAME}/utils/"* "${OUT_DIR}/utils/"
+            fi
+          done
+
+          # Create archive for each platform
+          ARTIFACTS=""
+          for platform in "${PLATFORMS[@]}"; do
+            read -r os arch <<< "$platform"
+            OUT_DIR="${BUILD_DIR}/${os}/${BINARY_NAME}"
+            ARCHIVE_NAME="${TOOL_NAME}-${os}-${arch}"
+
+            if [ "$os" = "windows" ]; then
+              (cd "$OUT_DIR" && zip -r "../../${ARCHIVE_NAME}.zip" .)
+            else
+              (cd "$OUT_DIR" && tar -czf "../../${ARCHIVE_NAME}.tar.gz" .)
+            fi
+            ARTIFACTS="${ARTIFACTS} ${BUILD_DIR}/${ARCHIVE_NAME}.*"
+          done
+
+          echo "artifacts=${ARTIFACTS}" >> $GITHUB_OUTPUT
+
+      - name: Upload release artifacts
+        uses: softprops/action-gh-release@v2
+        with:
+          files: ${{ steps.build.outputs.artifacts }}
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}

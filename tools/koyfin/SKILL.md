@@ -7,73 +7,125 @@ description: Koyfin CLI tools for financial data access including stock search, 
 
 ## Installation
 
-The tool is built to the AI skills directory's `scripts/` folder. Python utilities are copied to the same directory.
+The tool is built from source to the AI skills directory's `scripts/` folder. Python utilities are copied to the same directory.
 
-## CLI Commands
+## Commands
 
 ### auth
 
-**Authenticate with Koyfin account email and password:**
+Authenticate with Koyfin using email and password.
 
 ```bash
-./scripts/koyfin auth -email "user@example.com" -password "secret"
+koyfin auth -email "user@example.com" -password "secret"
 ```
 
-| Flag | Description | Required |
-|------|-------------|----------|
-| `-email` | Koyfin email address | Yes |
-| `-password` | Koyfin password | Yes |
+| Flag | Type | Description | Required |
+|------|------|-------------|----------|
+| `-email` | string | Koyfin email address | Yes |
+| `-password` | string | Koyfin password | Yes |
 
-Session persists across CLI invocations and tokens refreshed automatically.
+**Examples:**
+```bash
+# Non-interactive mode (for automation)
+koyfin auth -email "user@example.com" -password "secret"
+```
+
+Session persists across CLI invocations and tokens are refreshed automatically.
+
+---
 
 ### search
 
 Search for stocks/tickers by name.
 
 ```bash
-./scripts/koyfin search -q "Apple"
-./scripts/koyfin search -q "SPY" -categories "ETF"
+koyfin search -q "Apple"
+koyfin search -q "SPY" -categories "ETF"
 ```
 
-| Flag | Description | Default |
-|------|-------------|---------|
-| `-q` | Ticker/ETF name (required) | - |
-| `-categories` | Categories (comma-separated) | Equity,ETF |
-| `-primary-only` | Primary exchange only | false |
+| Flag | Type | Description | Default |
+|------|------|-------------|---------|
+| `-q` | string | Ticker or ETF name to search for | - |
+| `-categories` | string | Search categories (comma-separated) | `Equity,ETF` |
+| `-primary-only` | bool | Use primary exchange only | `false` |
+
+**Examples:**
+```bash
+# Search for Apple stock
+koyfin search -q "Apple"
+
+# Search for ETF
+koyfin search -q "SPY" -categories "ETF"
+
+# Primary exchange only
+koyfin search -q "Microsoft" -primary-only
+```
+
+---
 
 ### snapshot
 
 Get snapshot data with financial metrics.
 
 ```bash
-./scripts/koyfin snapshot -kids <list_of_koyfin_ids> -category Equity
+koyfin snapshot -kids "KID1,KID2,KID3" -category Equity
 ```
 
-| Flag | Description | Default |
-|------|-------------|---------|
-| `-kids` | Comma-separated Koyfin IDs (required) | - |
-| `-category` | Equity or ETF | Equity |
+| Flag | Type | Description | Default |
+|------|------|-------------|---------|
+| `-kids` | string | Comma-separated list of Koyfin IDs | - |
+| `-category` | string | Category: `Equity` or `ETF` | `Equity` |
 
-**Limits:** Max 32 KIDs (Equity), 2 KIDs (ETF)
+**Limits:**
+| Category | Max KIDs |
+|----------|----------|
+| Equity | 32 |
+| ETF | 2 |
+
+**Examples:**
+```bash
+# Get snapshot for multiple stocks
+koyfin snapshot -kids "KID1,KID2,KID3" -category Equity
+
+# Get snapshot for ETFs
+koyfin snapshot -kids "KID1,KID2" -category ETF
+```
+
+---
 
 ### ticker-data
 
 Get time series data for a ticker.
 
 ```bash
-./scripts/koyfin ticker-data -id <koyfin_id> -key "p_candle_range" -date-from "2024-01-01"
-./scripts/koyfin ticker-data -id <koyfin_id> -key "f_r" -date-from "2020-01-01" -fin-period "quarterly"
+koyfin ticker-data -kid "KID" -key "p_candle_range" -date-from "2024-01-01"
+koyfin ticker-data -kid "KID" -key "f_r" -date-from "2020-01-01" -fin-period "quarterly"
 ```
 
-| Flag | Description | Default |
-|------|-------------|---------|
-| `-id` | Koyfin ID (required) | - |
-| `-key` | Indicator key (required) | - |
-| `-date-from` | Start date YYYY-MM-DD (required) | - |
-| `-date-to` | End date YYYY-MM-DD | Today |
-| `-currency` | Data currency | USD |
-| `-agg-period` | day, monthly, quarterly, annually | day |
-| `-fin-period` | quarterly, annual, LTM | - |
+| Flag | Type | Description | Default |
+|------|------|-------------|---------|
+| `-kid` | string | Koyfin ID for the ticker | - |
+| `-key` | string | Indicator key to search for | - |
+| `-date-from` | string | Start date in YYYY-MM-DD format | - |
+| `-date-to` | string | End date in YYYY-MM-DD format | Today |
+| `-currency` | string | Data currency | `USD` |
+| `-agg-period` | string | Series granularity: `day`, `monthly`, `quarterly`, `annually` | `day` |
+| `-price-format` | string | Price format: `both`, `standard`, `adj` (auto-set based on key) | - |
+| `-fin-period` | string | Financial period: `quarterly`, `annual`, `LTM` | - |
+
+**Examples:**
+```bash
+# Get 1 year price data
+koyfin ticker-data -kid "KID" -key "p_candle_range" -date-from "2024-01-01"
+
+# Get quarterly revenue
+koyfin ticker-data -kid "KID" -key "f_r" -date-from "2020-01-01" -fin-period "quarterly"
+
+# Get data in different currency
+koyfin ticker-data -kid "KID" -key "p_candle_range" -date-from "2024-01-01" -currency "EUR"
+```
+
+---
 
 ### transcript
 
@@ -81,80 +133,121 @@ Earnings call transcripts (list, get, summary).
 
 ```bash
 # List transcripts
-./scripts/koyfin transcript -action list -kid <koyfin_id> -limit 5
+koyfin transcript -action list -kid "KID" -limit 5
 
 # Get specific transcript
-./scripts/koyfin transcript -action get -transcript-id <transcript_id>
+koyfin transcript -action get -transcript-id 12345
 
 # Get transcript summary
-./scripts/koyfin transcript -action summary -transcript-id <transcript_id>
+koyfin transcript -action summary -transcript-id 12345
 ```
 
-| Flag | Description | Default |
-|------|-------------|---------|
-| `-action` | list, get, summary (required) | list |
-| `-kid` | Koyfin ID (required for list) | - |
-| `-transcript-id` | Key dev ID (required for get/summary) | - |
-| `-limit` | Max results for list (1-64) | 10 |
+| Flag | Type | Description | Default |
+|------|------|-------------|---------|
+| `-action` | string | Action: `list`, `get`, `summary` | `list` |
+| `-kid` | string | Koyfin ID (required for `list`) | - |
+| `-transcript-id` | int | Key development identifier (required for `get`/`summary`) | - |
+| `-limit` | int | Maximum results for `list` action (1-64) | `10` |
+
+**Examples:**
+```bash
+# List recent transcripts
+koyfin transcript -action list -kid "KID" -limit 5
+
+# Get transcript by ID
+koyfin transcript -action get -transcript-id 12345
+
+# Get AI-generated summary
+koyfin transcript -action summary -transcript-id 12345
+```
+
+---
 
 ### schema
 
 Get indicator schema.
 
 ```bash
-./scripts/koyfin schema -asset-type Equity -indicator-type financials
-./scripts/koyfin schema -asset-type Equity -indicator-type ratios
+koyfin schema -asset-type Equity -indicator-type financials
+koyfin schema -asset-type Equity -indicator-type ratios
 ```
 
-| Flag | Description | Default |
-|------|-------------|---------|
-| `-asset-type` | Asset type | Equity |
-| `-indicator-type` | financials, ratios, forward_estimates, market_data (required) | - |
+| Flag | Type | Description | Default |
+|------|------|-------------|---------|
+| `-asset-type` | string | Asset type | `Equity` |
+| `-indicator-type` | string | Indicator type: `financials`, `ratios`, `forward_estimates`, `market_data` | - |
+
+**Examples:**
+```bash
+# Get financials schema
+koyfin schema -asset-type Equity -indicator-type financials
+
+# Get ratios schema
+koyfin schema -asset-type Equity -indicator-type ratios
+
+# Get market data schema
+koyfin schema -asset-type Equity -indicator-type market_data
+```
+
+---
 
 ### etf-holdings
 
 Get ETF holdings.
 
 ```bash
-./scripts/koyfin etf-holdings -kids <list_of_koyfin_ids> -category ETF
+koyfin etf-holdings -kids "KID1,KID2" -category ETF
 ```
 
-| Flag | Description | Default |
-|------|-------------|---------|
-| `-kids` | Koyfin IDs, max 2 (required) | - |
-| `-category` | Must be ETF | ETF |
+| Flag | Type | Description | Default |
+|------|------|-------------|---------|
+| `-kids` | string | Comma-separated list of Koyfin IDs for ETFs (max 2) | - |
+| `-category` | string | Category (must be `ETF`) | `ETF` |
+
+**Examples:**
+```bash
+# Get holdings for single ETF
+koyfin etf-holdings -kids "KID1" -category ETF
+
+# Get holdings for multiple ETFs
+koyfin etf-holdings -kids "KID1,KID2" -category ETF
+```
+
+---
 
 ### screener-schema
 
 Get screener filter schema.
 
 ```bash
-./scripts/koyfin screener-schema -asset-type Equity
+koyfin screener-schema -asset-type Equity
 ```
 
-| Flag | Description | Default |
-|------|-------------|---------|
-| `-asset-type` | Asset type | Equity |
+| Flag | Type | Description | Default |
+|------|------|-------------|---------|
+| `-asset-type` | string | Asset type | `Equity` |
+
+**Examples:**
+```bash
+# Get screener schema for Equity
+koyfin screener-schema -asset-type Equity
+```
+
+---
 
 ### screener
 
 Run stock screener.
 
 ```bash
-# Large cap (>10B)
-./scripts/koyfin screener -filters '[{"key":"mkt","min":10000,"max":9007199254740991}]'
-
-# Tech sector, 1B-10B market cap
-./scripts/koyfin screener -filters '[{"key":"t_sec","values":["Information Technology"]},{"key":"mkt","min":1000,"max":10000}]'
-
-# EV/EBITDA < 10
-./scripts/koyfin screener -filters '[{"key":"evebitdaltm","min":0,"max":10}]'
+koyfin screener -filters '[{"key":"mkt","min":10000}]'
+koyfin screener -filters '[{"key":"t_sec","values":["Information Technology"]},{"key":"mkt","min":1000,"max":10000}]'
 ```
 
-| Flag | Description | Default |
-|------|-------------|---------|
-| `-filters` | JSON filter array (required) | - |
-| `-page-size` | Max 300 | 100 |
+| Flag | Type | Description | Default |
+|------|------|-------------|---------|
+| `-filters` | string | JSON array of filter conditions | - |
+| `-page-size` | int | Page size (max 300) | `100` |
 
 **Filter Types & Units:**
 
@@ -169,7 +262,24 @@ Run stock screener.
 | `pb_ratio` | Ratio | `{"max":3}` = <3x |
 | `div_yield` | Decimal (not %) | `{"min":0.03}` = >3% |
 | `iso2` | Country code | `{"values":["JP","US"]}` |
-| `t_sec` | Sector name | `{"values":["Technology"]}` |
+| `t_sec` | Sector name | `{"values":["Information Technology"]}` |
+
+**Examples:**
+```bash
+# Large cap (>10B)
+koyfin screener -filters '[{"key":"mkt","min":10000}]'
+
+# Tech sector, 1B-10B market cap
+koyfin screener -filters '[{"key":"t_sec","values":["Information Technology"]},{"key":"mkt","min":1000,"max":10000}]'
+
+# EV/EBITDA < 10
+koyfin screener -filters '[{"key":"evebitdaltm","max":10}]'
+
+# Custom page size
+koyfin screener -filters '[{"key":"mkt","min":10000}]' -page-size 50
+```
+
+---
 
 ## Python Utilities
 
@@ -186,8 +296,7 @@ Location: `scripts/` (same directory as binary)
 Export snapshot data to Excel with multiple sheets:
 
 ```bash
-./scripts/koyfin snapshot -kids <list_of_koyfin_ids> -category Equity | \
-    python3 ./scripts/excel_export.py -o <target_xlsx_file>
+koyfin snapshot -kids "KID1,KID2,KID3" | python3 excel_export.py -o snapshot.xlsx
 ```
 
 **Excel Sheets Created:**
@@ -202,88 +311,92 @@ Export snapshot data to Excel with multiple sheets:
 ### Install Dependencies (for Excel export)
 
 ```bash
-pip3 install -r ./scripts/requirements.txt
+pip3 install -r requirements.txt
 ```
 
 ### Format Output
 
 ```bash
 # Format search results as table
-./scripts/koyfin search -q "Apple" | python3 ./scripts/process.py search
+koyfin search -q "Apple" | python3 process.py search
 
 # Format snapshot
-./scripts/koyfin snapshot -kids <list_of_koyfin_ids> | python3 ./scripts/process.py snapshot
+koyfin snapshot -kids "KID1,KID2" | python3 process.py snapshot
 
 # Format time series
-./scripts/koyfin ticker-data -id <koyfin_id> -key "p_candle_range" -date-from "2024-01-01" | \
-    python3 ./scripts/process.py ticker
+koyfin ticker-data -kid "KID" -key "p_candle_range" -date-from "2024-01-01" | python3 process.py ticker
 ```
+
+---
 
 ## Examples
 
 ```bash
-# Interactive authentication
-./scripts/koyfin auth
-
-# Non-interactive authentication (automation)
-./scripts/koyfin auth -email "user@example.com" -password "secret"
+# Non-interactive authentication
+koyfin auth -email "user@example.com" -password "secret"
 
 # Search for Apple
-./scripts/koyfin search -q "Apple"
+koyfin search -q "Apple"
 
 # Get snapshot
-./scripts/koyfin snapshot -kids <list_of_koyfin_ids> -category Equity
+koyfin snapshot -kids "KID1,KID2" -category Equity
 
 # Get 1 year price data
-./scripts/koyfin ticker-data -kid <koyfin_id> -key "p_candle_range" -date-from "2024-01-01"
+koyfin ticker-data -kid "KID" -key "p_candle_range" -date-from "2024-01-01"
 
 # List recent transcripts
-./scripts/koyfin transcript -action list -kid <koyfin_id> -limit 5
+koyfin transcript -action list -kid "KID" -limit 5
 
 # Get transcript
-./scripts/koyfin transcript -action get -transcript-id <transcript_id>
+koyfin transcript -action get -transcript-id 12345
 
 # Get transcript summary
-./scripts/koyfin transcript -action summary -transcript-id <transcript_id>
+koyfin transcript -action summary -transcript-id 12345
 
 # Screen for large cap tech
-./scripts/koyfin screener -filters '[{"key":"t_sec","values":["Information Technology"]},{"key":"mkt","min":10000}]' -page-size 50
+koyfin screener -filters '[{"key":"t_sec","values":["Information Technology"]},{"key":"mkt","min":10000}]' -page-size 50
 
 # Export snapshot to Excel
-./scripts/koyfin snapshot -kids <list_of_koyfin_ids> | python3 ./scripts/excel_export.py -o snapshot.xlsx
+koyfin snapshot -kids "KID1,KID2" | python3 excel_export.py -o snapshot.xlsx
 ```
+
+---
 
 ## Session Location
 
 Session file is stored in the scripts directory:
 
 ```
-scripts/session.json
+<skills-dir>/koyfin/scripts/session.json
 ```
 
 **Note:** This directory is excluded from version control (`.gitignore`) to protect authentication tokens.
+
+---
 
 ## Troubleshooting
 
 **Command not found:**
 
-Always use the full path from the skills directory:
+Ensure the binary is in your PATH or use the full path:
 ```bash
-./scripts/koyfin <command>
+<skills-dir>/koyfin/scripts/koyfin <command>
 ```
 
 **Permission denied:**
 ```bash
-chmod +x ./scripts/koyfin
+chmod +x <skills-dir>/koyfin/scripts/koyfin
 ```
 
 **Session expired:**
 ```bash
-./scripts/koyfin auth -email "user@example.com" -password "secret"
+koyfin auth -email "user@example.com" -password "secret"
 ```
+
+---
 
 ## Requirements
 
-- Go 1.21+
+- Go 1.21+ (for building from source)
 - Koyfin account
 - Python 3 (optional, for Excel export utilities)

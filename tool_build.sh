@@ -1,15 +1,4 @@
 #!/bin/bash
-# Build script for entext-research-tool tools
-# Usage: ./tool_build.sh [tool-name] [skills-dir]
-#
-# Available tools:
-#   substack-reader  - Substack CLI tools
-#   koyfin           - Koyfin CLI tools
-#
-# Arguments:
-#   tool-name   - Name of the tool to build (required)
-#   skills-dir  - AI skills directory for deployment (required)
-#                 If not provided, will prompt for it
 
 set -euo pipefail
 
@@ -115,7 +104,7 @@ Arguments:
                 If not provided, will prompt for it
 
 Available tools:
-  substack-reader
+  substack
   koyfin
 
 Examples:

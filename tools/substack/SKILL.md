@@ -9,7 +9,7 @@ Part of the **entext-research-tool** skill suite.
 
 ## Installation
 
-The tool is built to the AI skills directory's `scripts/` folder.
+The tool is built from source to the AI skills directory's `scripts/` folder.
 
 ## Authentication
 
@@ -17,10 +17,10 @@ The tool is built to the AI skills directory's `scripts/` folder.
 
 ```bash
 # Step 1: Set email address
-./scripts/substack profile -email "user@example.com"
+substack profile -email "user@example.com"
 
-# Step 2: Complete with authentication code or link (obtained from email)
-./scripts/substack auth -auth-link "https://substack.com/auth?token=..."
+# Step 2: Complete with authentication link (obtained from email)
+substack auth -auth_string "https://substack.com/auth?token=..."
 ```
 
 Session persists across CLI invocations and auto-refreshes.
@@ -32,74 +32,170 @@ Session persists across CLI invocations and auto-refreshes.
 Set Substack email address for authentication.
 
 ```bash
-./scripts/substack profile -email "user@example.com"
+substack profile -email "user@example.com"
 ```
 
-| Flag | Description | Required |
-|------|-------------|----------|
-| `-email` | Substack email address | Yes |
+| Flag | Type | Description | Required |
+|------|------|-------------|----------|
+| `-email` | string | Substack email address | Yes |
+
+**Examples:**
+```bash
+# Set email address
+substack profile -email "user@example.com"
+```
+
+---
 
 ### auth
 
-Complete Substack authentication with URL or code from email.
+Complete Substack authentication with link or code from email.
 
 ```bash
-./scripts/substack auth -auth_string "https://substack.com/auth?token=..."
+substack auth -auth_string "https://substack.com/auth?token=..."
 ```
 
-| Flag | Description | Required |
-|------|-------------|----------|
-| `-auth_string` | Authentication code or URL from email | Yes |
+| Flag | Type | Description | Required |
+|------|------|-------------|----------|
+| `-auth_string` | string | Authentication link or code from Substack email | Yes |
+
+**Flow:**
+1. Run `substack profile -email <email>`
+2. Check your email for the authentication link
+3. Run `substack auth -auth_string <link>`
+
+**Examples:**
+```bash
+# Complete auth with link (for automation)
+substack auth -auth_string "https://substack.com/auth?token=..."
+```
+
+---
 
 ### inbox
 
 Get chronological inbox posts.
 
 ```bash
-./scripts/substack inbox
-./scripts/substack inbox -after "2024-01-01T00:00:00.000Z"
+substack inbox
+substack inbox -after "2024-01-01T00:00:00.000Z"
 ```
+
+| Flag | Type | Description | Required |
+|------|------|-------------|----------|
+| `-after` | string | Timestamp cursor for pagination (RFC3339 format) | No |
+
+**Examples:**
+```bash
+# Get all inbox posts
+substack inbox
+
+# Paginate with timestamp cursor
+substack inbox -after "2024-01-01T00:00:00.000Z"
+
+# Extract titles with jq
+substack inbox | jq '.data.posts[] | .title'
+
+# Count posts
+substack inbox | jq '.data.posts | length'
+```
+
+---
 
 ### article
 
 Get article content by post ID.
 
 ```bash
-./scripts/substack article -post-id 123456
+substack article -post-id 123456
 ```
+
+| Flag | Type | Description | Required |
+|------|------|-------------|----------|
+| `-post-id` | uint | Post ID to retrieve content for | Yes |
+| `-base-url` | string | Custom Substack domain (e.g., `substack.com`) | No |
+| `-compact-mode` | bool | Compact content mode (default: false) | No |
+
+**Examples:**
+```bash
+# Get article by ID
+substack article -post-id 123456
+
+# Use custom domain
+substack article -post-id 123456 -base-url "substack.com"
+
+# Compact mode
+substack article -post-id 123456 -compact-mode
+```
+
+---
 
 ### search
 
-Search Substack posts.
+Search Substack posts with different modes.
 
 ```bash
-./scripts/substack search -query "AI" -mode top
-./scripts/substack search -query "tech" -mode all
-./scripts/substack search -query "news" -mode subscribed
+substack search -query "AI" -mode top
+substack search -query "tech" -mode all
+substack search -query "news" -mode subscribed
 ```
 
+| Flag | Type | Description | Required |
+|------|------|-------------|----------|
+| `-query` | string | Search query | Yes |
+| `-mode` | string | Search mode: `top`, `all`, `subscribed` (default: `all`) | No |
+| `-page` | int | Page number for pagination (0-10, not used for `top` mode) | No |
+| `-language` | string | Language code (2-letter, e.g., `en`) | No |
+
 **Search Modes:**
-- `top` - Top-ranked results
-- `all` - All posts (default)
-- `subscribed` - Subscribed publications only
+| Mode | Description |
+|------|-------------|
+| `top` | Top-ranked results |
+| `all` | All posts (default) |
+| `subscribed` | Subscribed publications only |
+
+**Examples:**
+```bash
+# Top results
+substack search -query "AI" -mode top
+
+# All posts with pagination
+substack search -query "technology" -mode all -page 1
+
+# Subscribed publications only
+substack search -query "newsletter" -mode subscribed
+
+# Language filter
+substack search -query "openclaw" -language en
+```
+
+---
 
 ## Examples
 
+### Authentication
+
 ```bash
 # Non-interactive authentication (automation)
-./scripts/substack profile -email "user@example.com"
-./scripts/substack auth -auth-link "https://substack.com/auth?token=..."
+substack profile -email "user@example.com"
+substack auth -auth_string "https://substack.com/auth?token=..."
+```
 
+### Working with Posts
+
+```bash
 # Get inbox and extract titles
-./scripts/substack inbox | jq '.data.posts[] | .title'
+substack inbox | jq '.data.posts[] | .title'
 
 # Search and get article
-POST_ID=$(./scripts/substack search -query "AI" -mode top | jq '.data.results[0].id')
-./scripts/substack article -post-id $POST_ID
+POST_ID=$(substack search -query "AI" -mode top | jq '.data.results[0].id')
+substack article -post-id $POST_ID
 
 # Count posts in inbox
-./scripts/substack inbox | jq '.data.posts | length'
+substack inbox | jq '.data.posts | length'
 ```
+
+---
 
 ## Managing Large Outputs
 
@@ -107,13 +203,13 @@ Article content and search results can be large. Pipe to files for processing:
 
 ```bash
 # Article by ID
-./scripts/substack article -post-id 191095022 > article_191095022.json
+substack article -post-id 191095022 > article_191095022.json
 
 # Search with query terms + timestamp
-./scripts/substack search -query "openclaw china" > search_openclaw_china_$(date +%Y%m%d).json
+substack search -query "openclaw china" > search_openclaw_china_$(date +%Y%m%d).json
 
 # Inbox with date
-./scripts/substack inbox > inbox_$(date +%Y%m%d).json
+substack inbox > inbox_$(date +%Y%m%d).json
 
 # Process file later
 jq '.data.post.title' article_191095022.json
@@ -125,42 +221,48 @@ jq '.data.results[] | {title, id}' search_openclaw_china_$(date +%Y%m%d).json
 - Include query terms for searches: `search_<query>_<date>.json`
 - Use dated filenames for recurring commands: `inbox_YYYYMMDD.json`
 
+---
+
 ## Session Location
 
 Session file is stored in the scripts directory:
 
 ```
-./scripts/session.json
+<skills-dir>/substack/scripts/session.json
 ```
 
 **Note:** This directory is excluded from version control (`.gitignore`) to protect authentication tokens.
+
+---
 
 ## Troubleshooting
 
 **Command not found:**
 
-Always use the full path from the skills directory:
+Ensure the binary is in your PATH or use the full path:
 ```bash
-./scripts/substack <command>
+<skills-dir>/substack/scripts/substack <command>
 ```
 
 **Permission denied:**
 ```bash
-chmod +x ./scripts/substack
+chmod +x <skills-dir>/substack/scripts/substack
 ```
 
 **Session expired:**
 ```bash
-./scripts/substack profile -email "user@example.com"
-./scripts/substack auth
+substack profile -email "user@example.com"
+substack auth -auth_string "<link>"
 ```
 
 **Email not set:**
 ```bash
-./scripts/substack profile -email "user@example.com"
+substack profile -email "user@example.com"
 ```
+
+---
 
 ## Requirements
 
-- Go 1.21+
+- Go 1.21+ (for building from source)
 - Substack account
