@@ -65,7 +65,7 @@ jobs:
 
             # Build binary
             echo "Building ${TOOL_NAME} for ${os}/${arch}..."
-            GOOS="$os" GOARCH="$arch" go build -ldflags='-w -s' -o "$BIN_FILE" "$SRC_DIR/"
+            GOOS="$os" GOARCH="$arch" go build -ldflags='-w -s' -o "$BIN_FILE" "./${SRC_DIR}/"
 
             # Copy SKILL.md
             cp "tools/${TOOL_NAME}/SKILL.md" "${OUT_DIR}/"
