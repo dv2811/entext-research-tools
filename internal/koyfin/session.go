@@ -123,6 +123,6 @@ func (s *Session) AuthorizeHeader(header http.Header) {
 
 	// set cookie
 	if b.Len() > 0 {
-		header.Set("Cookies", b.String())
+		header.Set("Cookie", b.String())
 	}
 }

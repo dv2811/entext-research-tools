@@ -1,0 +1,10 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(koyfin *)",
+      "Read(//home/dv/.qwen/skills/koyfin/**)",
+      "Bash(/home/dv/.qwen/skills/koyfin/scripts/koyfin *)"
+    ]
+  },
+  "$version": 3
+}
