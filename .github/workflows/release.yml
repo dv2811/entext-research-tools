@@ -69,10 +69,9 @@ jobs:
               # Copy SKILL.md
               cp "tools/${TOOL_NAME}/SKILL.md" "${TOOL_DIR}/"
 
-              # Copy utils if exists
+              # Copy utils into scripts if exists
               if [ -d "tools/${TOOL_NAME}/utils" ]; then
-                mkdir -p "${TOOL_DIR}/utils"
-                cp -r "tools/${TOOL_NAME}/utils/"* "${TOOL_DIR}/utils/"
+                cp -r "tools/${TOOL_NAME}/utils/"* "${TOOL_DIR}/scripts/"
               fi
             done
           done

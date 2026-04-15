@@ -31,7 +31,7 @@ func runSearch(client *substack.Client, session *substack.Session, args []string
 
 	var (
 		query, mode, language string
-		page int
+		page                  int
 	)
 	fs := newFlagSet("search")
 	fs.StringVar(&query, "query", "", "Search query (required)")

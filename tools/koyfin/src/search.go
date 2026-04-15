@@ -11,10 +11,10 @@ import (
 func runSearch(client *koyfin.Client, session *koyfin.Session, args []string) {
 	var (
 		query, categories string
-		primaryOnly bool
+		primaryOnly       bool
 	)
 	fs := newFlagSet("search")
-	fs.StringVar(&query,"q", "", "Ticker or ETF name to search for (required)")
+	fs.StringVar(&query, "q", "", "Ticker or ETF name to search for (required)")
 	fs.StringVar(&categories, "categories", "Equity,ETF", "Search categories (comma-separated)")
 	fs.BoolVar(&primaryOnly, "primary-only", false, "Use primary exchange only")
 

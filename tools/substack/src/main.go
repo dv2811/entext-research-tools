@@ -9,6 +9,7 @@ import (
 	"os/signal"
 	"path/filepath"
 	"syscall"
+	"time"
 )
 
 // getSessionFile returns the path to the session file in the binary's directory
@@ -96,7 +97,8 @@ func main() {
 		}
 	}
 
-	if err != nil {
+	// For health command, don't exit on load error - let runHealth handle it
+	if err != nil && command != "health" {
 		fmt.Fprintf(os.Stderr, "Error loading session: %v\n", err)
 		fmt.Fprintf(os.Stderr, "Run 'substack profile -email <email>' then 'substack auth' to authenticate\n")
 		os.Exit(1)
@@ -133,6 +135,8 @@ func main() {
 		runProfile(client, session, os.Args[2:])
 	case "auth":
 		runAuth(client, session, os.Args[2:])
+	case "health":
+		runHealth(session)
 	case "help", "-h", "--help":
 		printUsage(substackToolUsage)
 	default:
@@ -151,6 +155,7 @@ Commands:
   search    Search posts with different modes
   profile   Set Substack email address
   auth      Authenticate with Substack via email link
+  health    Check session health
 
 Examples:
   substack profile -email "user@example.com"
@@ -198,4 +203,35 @@ func checkValidSession(session *substack.Session) {
 		fmt.Fprintf(os.Stderr, "existing session with valid email must be provided\n")
 		os.Exit(1)
 	}
+}
+
+// runHealth checks if the session file exists and is valid
+func runHealth(session *substack.Session) {
+	sessionFile, err := getSessionFile()
+	if err != nil {
+		fmt.Fprintf(os.Stderr, "Error: %v\n", err)
+		os.Exit(1)
+	}
+
+	if _, err := os.Stat(sessionFile); os.IsNotExist(err) {
+		fmt.Fprintf(os.Stderr, "Session file not found\n")
+		os.Exit(1)
+	}
+
+	if session.Email == "" {
+		fmt.Fprintf(os.Stderr, "No email set\n")
+		os.Exit(1)
+	}
+
+	if len(session.Cookies) == 0 {
+		fmt.Fprintf(os.Stderr, "Not authenticated\n")
+		os.Exit(1)
+	}
+
+	if session.Expiry.IsZero() || session.Expiry.Before(time.Now()) {
+		fmt.Fprintf(os.Stderr, "Session expired\n")
+		os.Exit(1)
+	}
+
+	fmt.Println("OK")
 }

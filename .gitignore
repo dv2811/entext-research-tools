@@ -1,5 +1,6 @@
 # Test binary
 *.test
+.qwen
 
 # Output of the go coverage tool
 *.out
@@ -36,3 +37,5 @@ go.work
 
 # Internal documentation (not for public repo)
 GUIDE.md
+
+.qwen

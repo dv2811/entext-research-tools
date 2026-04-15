@@ -29,8 +29,8 @@ func runArticle(client *substack.Client, session *substack.Session, args []strin
 	checkValidSession(session)
 
 	var (
-		baseURL string
-		postID int
+		baseURL     string
+		postID      int
 		compactMode bool
 	)
 

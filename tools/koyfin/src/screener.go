@@ -5,9 +5,9 @@ import (
 	"fmt"
 	"os"
 
-	"entext-applications/internal/validator"
 	"entext-applications/internal/koyfin"
 	"entext-applications/internal/utils"
+	"entext-applications/internal/validator"
 )
 
 func runScreener(client *koyfin.Client, session *koyfin.Session, args []string) {
