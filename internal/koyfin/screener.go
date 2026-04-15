@@ -203,33 +203,12 @@ var ScreenerMetrics = map[string][]map[string]any{
 			)),
 			keyVal("required", []string{"key", "min", "max"}),
 		),
-		// EV/EBITDA Ratio filter - numeric type with min/max and key enum
-		IndicatorSchema(
-			keyVal("description", "EV/EBITDA Ratio filter, trailing (LTM) or forward (NTM)"),
-			keyVal("type", "object"),
-			keyVal("properties", IndicatorSchema(
-				keyVal("key", IndicatorSchema(
-					keyVal("type", "string"),
-					keyVal("enum", []string{"evebitdaltm", "evebitda"}),
-					keyVal("description", "evebitdaltm: last 12m EB/EBITDA ratio, evebitda: next 12m EB/EBITDA ratio"),
-				)),
-				keyVal("min", IndicatorSchema(
-					keyVal("type", "number"),
-					keyVal("description", "minimum EV/EBITDA ratio"),
-				)),
-				keyVal("max", IndicatorSchema(
-					keyVal("type", "number"),
-					keyVal("description", "maximum EV/EBITDA ratio"),
-				)),
-			)),
-			keyVal("required", []string{"key", "min", "max"}),
-		),
 		// Scan for EPS revision
 		IndicatorSchema(
 			keyVal("description", "Filter equities by recent next FY revenue estimate upgrade/downgrade"),
 			keyVal("type", "object"),
 			keyVal("properties", IndicatorSchema(
-				keyValueDescription("key", "", "fest_esteps_median_1m_rp_fy0_chgPct"),
+				keyValueDescription("key", "", "fest_estsales_1m_rp_fy0_chgPct"),
 				keyVal("min", IndicatorSchema(
 					keyVal("type", "number"),
 					keyVal("description", "minimum revenue revision, percentage in decimal form"),
@@ -249,11 +228,11 @@ var ScreenerMetrics = map[string][]map[string]any{
 				keyValueDescription("key", "", "fest_esteps_1m_rp_fy0_chgPct"),
 				keyVal("min", IndicatorSchema(
 					keyVal("type", "number"),
-					keyVal("description", "minimum revenue revision, percentage in decimal form"),
+					keyVal("description", "minimum est EPS revision, percentage in decimal form"),
 				)),
 				keyVal("max", IndicatorSchema(
 					keyVal("type", "number"),
-					keyVal("description", "maximum revenue revision, percentage in decimal form"),
+					keyVal("description", "maximum est EPS revision, percentage in decimal form"),
 				)),
 			)),
 			keyVal("required", []string{"key", "min", "max"}),
